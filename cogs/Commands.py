@@ -4,7 +4,9 @@ from nextcord.ext import commands
 import re
 import json
 import bcrypt
+from icecream import ic
 from asyncpg import Pool
+
 from db_conn import connect
 
 with open("config.json", "r") as f:
@@ -83,9 +85,12 @@ class Commands(commands.Cog):
 
             count: int = await cursor.fetchval("SELECT COUNT(*) FROM users WHERE discord_id = $1", discord_id)
             account_limit: int = CONFIG.get("account_limit", {}).get(discord_id, 1)
+            ic(CONFIG)
+            ic(count, account_limit, count >= account_limit)
+
             if count >= account_limit:
                 await ctx.followup.send(
-                    f"Вы достигли вашего текущего лимита. Вы уже владеете {account_limit} аккаунтами.", ephemeral=True
+                    f"Вы не можете зарегистрировать больше аккаунтов. Ваш текущий лимит {account_limit}", ephemeral=True
                 )
                 return
 
