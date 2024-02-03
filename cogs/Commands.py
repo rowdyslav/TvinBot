@@ -9,6 +9,7 @@ from asyncpg import Pool
 
 from db_conn import connect
 
+
 with open("config.json", "r") as f:
     CONFIG = json.load(f)
     ACCOUNTS_LIMITS = CONFIG.get("accounts_limits", {})
