@@ -1,7 +1,8 @@
-import asyncpg
 from os import environ
-from icecream import ic
+
+import asyncpg
 from dotenv import load_dotenv
+from icecream import ic
 
 load_dotenv()
 database_config = {

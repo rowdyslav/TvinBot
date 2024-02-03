@@ -1,14 +1,13 @@
+import json
+import re
+
+import bcrypt
 import nextcord
+from asyncpg import Pool
+from icecream import ic
 from nextcord.ext import commands
 
-import re
-import json
-import bcrypt
-from icecream import ic
-from asyncpg import Pool
-
 from db_conn import connect
-
 
 with open("config.json", "r") as f:
     CONFIG = json.load(f)
