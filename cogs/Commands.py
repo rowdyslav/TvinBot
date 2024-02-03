@@ -22,23 +22,17 @@ ADD COLUMN IF NOT EXISTS serverID VARCHAR(41) DEFAULT NULL;
 
 -- Добавляет расширение для генерации UUID
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
--- Добавляет триггер для генерации UUID
-CREATE OR REPLACE FUNCTION public.users_uuid_trigger_func()
-    RETURNS TRIGGER
-AS
-$function$
-    BEGIN
-        IF (new.uuid IS NULL) THEN
-        new.uuid = (SELECT uuid_generate_v4());
-    END IF;
-        return new;
-    END;
-$function$ LANGUAGE plpgsql;
 
-CREATE TRIGGER IF NOT EXISTS users_uuid_trigger
-    BEFORE INSERT ON users
-    FOR EACH ROW
-EXECUTE PROCEDURE public.users_uuid_trigger_func();
+-- Добавляет триггер для генерации UUID, если его еще не существует
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'users_uuid_trigger') THEN
+        CREATE TRIGGER users_uuid_trigger
+        BEFORE INSERT ON users
+        FOR EACH ROW
+        EXECUTE FUNCTION public.users_uuid_trigger_func();
+    END IF;
+END $$;
 
 -- Генерирует UUID для уже существующих пользователей
 UPDATE users SET uuid=(SELECT uuid_generate_v4()) WHERE uuid IS NULL;"""
