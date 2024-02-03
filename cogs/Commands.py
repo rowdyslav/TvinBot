@@ -76,7 +76,7 @@ class Commands(commands.Cog):
             return
         discord_id = str(ctx.user.id)
     
-        await ctx.defer(hidden=True)
+        ctx.response.defer()
 
         with open("config.json", "r") as f:
             config = json.load(f)
@@ -85,24 +85,22 @@ class Commands(commands.Cog):
         async with self.db_conn.acquire() as cursor:
             count: int = await cursor.fetchval("SELECT COUNT(*) FROM users WHERE discord_id = $1", discord_id)
             if count >= account_limit:
-                await ctx.send(
-                    f"Вы достигли вашего текущего лимита. Вы уже владеете {account_limit} аккаунтами.",
-                    hidden=True
+                await ctx.followup.send(
+                    f"Вы достигли вашего текущего лимита. Вы уже владеете {account_limit} аккаунтами.", ephemeral=True
                 )
                 return
 
             if not bool(re.match(r"^[\w\-\[\]{}^\\|`_]+$", username)):
-                await ctx.send(
-                    "В никнейме допускается только английские буквы и специальные символы!",
-                    hidden=True
+                await ctx.followup.send(
+                    "В никнейме допускается только английские буквы и специальные символы!", ephemeral=True
                 )
 
             is_registered = await cursor.fetchval(
                 "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)",
-                username,
+                username
             )
             if is_registered:
-                await ctx.send("Никнейм уже занят!", hidden=True)
+                await ctx.followup.send("Никнейм уже занят!", ephemeral=True)
                 return
 
             await cursor.execute(
@@ -111,7 +109,7 @@ class Commands(commands.Cog):
                 hash_password(password),
                 discord_id,
             )
-        await ctx.send("Вы были успешно зарегистрированы!", hidden=True)
+        await ctx.followup.send("Вы были успешно зарегистрированы!")
 
 
 def setup(client):
