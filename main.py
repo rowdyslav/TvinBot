@@ -1,6 +1,6 @@
 import os
-from dotenv import load_dotenv
 import nextcord
+from dotenv import load_dotenv
 from nextcord.ext import commands
 
 client = commands.Bot(intents=nextcord.Intents.default())
