@@ -1,6 +1,6 @@
 import asyncpg
-from icecream import ic
 from os import environ
+from icecream import ic
 from dotenv import load_dotenv
 
 load_dotenv()
