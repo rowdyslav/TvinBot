@@ -79,7 +79,7 @@ class Commands(commands.Cog):
         discord_id = str(ctx.user.id)
 
         async with self.db_conn.acquire() as cursor:
-            ctx.response.defer()
+            await ctx.response.defer()
 
             count: int = await cursor.fetchval("SELECT COUNT(*) FROM users WHERE discord_id = $1", discord_id)
             account_limit: int = CONFIG.get("account_limit", {}).get(discord_id, 1)
@@ -108,7 +108,7 @@ class Commands(commands.Cog):
                 hash_password(password),
                 discord_id,
             )
-        await ctx.followup.send("Вы были успешно зарегистрированы!")
+        await ctx.followup.send("Вы были успешно зарегистрированы!", ephemeral=True)
 
 
 def setup(client):
