@@ -7,6 +7,9 @@ import bcrypt
 from asyncpg import Pool
 from db_conn import connect
 
+with open("config.json", "r") as f:
+    CONFIG = json.load(f)
+
 CREATE_TABLES_SQL = """-- Создает таблицу
 CREATE TABLE IF NOT EXISTS users (
     username TEXT,
@@ -36,7 +39,6 @@ END $$;
 
 -- Генерирует UUID для уже существующих пользователей
 UPDATE users SET uuid=(SELECT uuid_generate_v4()) WHERE uuid IS NULL;"""
-
 
 def hash_password(password: str) -> str:
     hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(12))
@@ -75,15 +77,12 @@ class Commands(commands.Cog):
         if not (ctx.user and self.db_conn):
             return
         discord_id = str(ctx.user.id)
-    
-        ctx.response.defer()
-
-        with open("config.json", "r") as f:
-            config = json.load(f)
-        account_limit: int = config.get("account_limit", {}).get(discord_id, 1)
 
         async with self.db_conn.acquire() as cursor:
+            ctx.response.defer()
+
             count: int = await cursor.fetchval("SELECT COUNT(*) FROM users WHERE discord_id = $1", discord_id)
+            account_limit: int = CONFIG.get("account_limit", {}).get(discord_id, 1)
             if count >= account_limit:
                 await ctx.followup.send(
                     f"Вы достигли вашего текущего лимита. Вы уже владеете {account_limit} аккаунтами.", ephemeral=True
