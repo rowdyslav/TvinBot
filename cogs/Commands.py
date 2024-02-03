@@ -81,10 +81,7 @@ class Commands(commands.Cog):
         account_limit = config.get("account_limit", {}).get(discord_id, 1)
 
         async with self.db_conn.acquire() as cursor:
-            await cursor.execute(
-                "SELECT COUNT(*) FROM users WHERE discord_id = $1", discord_id
-            )
-            count = await cursor.fetchone()
+            count = await cursor.fetchval("SELECT COUNT(*) FROM users WHERE discord_id = $1", discord_id)
             if count[0] >= account_limit:
                 await ctx.response.send_message(
                     f"Вы достигли вашего текущего лимита. Вы уже владеете {account_limit} аккаунтами."
