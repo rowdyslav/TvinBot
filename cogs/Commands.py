@@ -76,7 +76,7 @@ class Commands(commands.Cog):
             return
         discord_id = str(ctx.user.id)
     
-        await ctx.response.defer()
+        await ctx.response.defer(hidden=True)
 
         with open("config.json", "r") as f:
             config = json.load(f)
