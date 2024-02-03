@@ -79,7 +79,7 @@ class Commands(commands.Cog):
         discord_id = str(ctx.user.id)
 
         async with self.db_conn.acquire() as cursor:
-            await ctx.response.defer()
+            await ctx.response.defer(ephemeral=True)
 
             count: int = await cursor.fetchval("SELECT COUNT(*) FROM users WHERE discord_id = $1", discord_id)
             account_limit: int = CONFIG.get("account_limit", {}).get(discord_id, 1)
