@@ -11,6 +11,7 @@ from db_conn import connect
 
 with open("config.json", "r") as f:
     CONFIG = json.load(f)
+    ACCOUNTS_LIMITS = CONFIG.get("accounts_limits", {})
 
 CREATE_TABLES_SQL = """-- Создает таблицу
 CREATE TABLE IF NOT EXISTS users (
@@ -84,10 +85,7 @@ class Commands(commands.Cog):
             await ctx.response.defer(ephemeral=True)
 
             count: int = await cursor.fetchval("SELECT COUNT(*) FROM users WHERE discord_id = $1", discord_id)
-            account_limit: int = CONFIG.get("account_limit", {}).get(discord_id, 1)
-            ic(CONFIG)
-            ic(count, account_limit, count >= account_limit)
-
+            account_limit: int = ACCOUNTS_LIMITS.get(discord_id, 1)
             if count >= account_limit:
                 await ctx.followup.send(
                     f"Вы не можете зарегистрировать больше аккаунтов. Ваш текущий лимит {account_limit}", ephemeral=True
