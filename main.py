@@ -14,7 +14,7 @@ for f in os.listdir("./cogs"):
 
 @client.event
 async def on_ready():
-    print(f"Логин как {client.user.name} ({client.user.id})")
+    print(f"Логин как {client.user.name} ({client.user.id})") # type: ignore
 
 
 client.run(TOKEN)

@@ -14,7 +14,7 @@ database_config = {
 
 async def connect() -> asyncpg.Pool | None:
     try:
-        db_conn = await asyncpg.create_pool(**database_config)
+        db_conn = await asyncpg.create_pool(**database_config)  # type: ignore
         if not db_conn:
             print("Ошибка подключения к базе данных!")
         return db_conn
