@@ -75,6 +75,8 @@ class Commands(commands.Cog):
         if not (ctx.user and self.db_conn):
             return
         discord_id = str(ctx.user.id)
+    
+        await ctx.response.defer()
 
         with open("config.json", "r") as f:
             config = json.load(f)
@@ -83,13 +85,13 @@ class Commands(commands.Cog):
         async with self.db_conn.acquire() as cursor:
             count: int = await cursor.fetchval("SELECT COUNT(*) FROM users WHERE discord_id = $1", discord_id)
             if count >= account_limit:
-                await ctx.response.send_message(
+                await ctx.followup.send(
                     f"Вы достигли вашего текущего лимита. Вы уже владеете {account_limit} аккаунтами."
                 )
                 return
 
             if not bool(re.match(r"^[\w\-\[\]{}^\\|`_]+$", username)):
-                await ctx.response.send_message(
+                await ctx.followup.send(
                     "В никнейме допускается только английские буквы и специальные символы!"
                 )
 
@@ -98,7 +100,7 @@ class Commands(commands.Cog):
                 username,
             )
             if is_registered:
-                await ctx.response.send_message("Никнейм уже занят!")
+                await ctx.followup.send("Никнейм уже занят!")
                 return
 
             await cursor.execute(
@@ -107,7 +109,7 @@ class Commands(commands.Cog):
                 hash_password(password),
                 discord_id,
             )
-        await ctx.response.send_message("Вы были успешно зарегистрированы!")
+        await ctx.followup.send("Вы были успешно зарегистрированы!")
 
 
 def setup(client):
